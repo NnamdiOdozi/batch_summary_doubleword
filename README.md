@@ -1,0 +1,354 @@
+# Batch PDF Summarization with Doubleword API
+
+A simple Python pipeline for batch processing PDF documents into structured summaries using the Doubleword API and open-weight models.
+
+## Overview
+
+This tool extracts text from PDF research papers and generates comprehensive 2000-word structured summaries using Doubleword's batch inference API. Originally built for literature reviews in actuarial machine learning research, it can be adapted for any bulk document summarization task.
+
+## Use Cases
+
+- **Literature reviews** - Summarize academic papers systematically
+- **Regulatory analysis** - Convert 200-page consultation papers into actionable digests
+- **Compliance** - Extract structured data from policy documents at scale
+- **Sentiment analysis** - Process customer feedback documents in bulk
+- **Research synthesis** - Analyze collections of technical reports
+
+## Performance
+
+**Real-world results:**
+- **Initial test:** 2 papers processed in ~1 minute
+- **Production run:** 33 papers processed in ~30 minutes
+- **Total cost:** ~15 pence for 35 papers
+- **SLA:** Selected 24-hour window, actual delivery < 30 minutes
+
+## How It Works
+
+The pipeline consists of three stages:
+
+### Stage 1: PDF Extraction & Batch Request Creation
+**Script:** `create_batch_requests_robust.py`
+
+- Scans `data/papers/` folder for PDF files
+- Extracts text using **pypdf** (fast) with **pdfplumber** fallback (robust)
+- Creates structured JSONL batch requests with custom summarization prompt
+- Outputs: `batch_requests.jsonl`
+
+### Stage 2: Batch Submission
+**Script:** `submit_batch.py`
+
+- Uploads `batch_requests.jsonl` to Doubleword API
+- Creates batch job with 1-hour completion window
+- Saves batch ID to `batch_id.txt` for tracking
+- Outputs: Batch ID for monitoring
+
+### Stage 3: Polling & Download
+**Script:** `poll_and_download.py`
+
+- Polls batch job status at configurable intervals (default: 60 seconds)
+- Automatically downloads results when completed
+- Calls `process_results.py` to extract and save individual summaries
+- Outputs: Individual markdown summaries in `data/summaries/`
+
+### Processing Results
+**Script:** `process_results.py`
+
+- Downloads batch output file from Doubleword API
+- Parses JSONL responses
+- Saves each summary as timestamped markdown file
+- Format: `{filename}_summary_{timestamp}.md`
+
+## Setup
+
+### 1. Install Dependencies
+
+Using uv (recommended):
+```bash
+uv sync
+source .venv/bin/activate  # Linux/macOS
+# OR on Windows: .venv\Scripts\activate
+```
+
+Or using pip:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate  # Linux/macOS  
+# OR on Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+**Requirements** ([requirements.txt](requirements.txt)):
+- `pypdf>=6.6.0` - Fast PDF text extraction
+- `pdfplumber>=0.11.9` - Robust fallback for complex PDFs
+- `openai>=2.14.0` - API client (compatible with Doubleword API)
+- `python-dotenv>=1.1.0` - Environment variable management
+
+### 2. Configure Environment Variables
+
+Copy the sample environment file:
+```bash
+cp .env.sample .env
+```
+
+Edit `.env` and fill in your credentials:
+```bash
+# Your Doubleword API token
+DOUBLEWORD_AUTH_TOKEN=your_api_token_here
+
+# Doubleword API endpoint
+DOUBLEWORD_BASE_URL=https://api.doubleword.ai/v1
+
+# Model to use
+DOUBLEWORD_MODEL=Qwen/Qwen3-VL-235B-A22B-Instruct-FP8
+or any other model you would like
+
+# Polling frequency (seconds)
+POLLING_INTERVAL=60
+
+# Batch completion window (how long the API has to complete the job)
+# Options: "1h" or "24h"
+COMPLETION_WINDOW=1h
+
+# Summary word count (target length for generated summaries)
+SUMMARY_WORD_COUNT=2000
+```
+
+**Get your API key:**
+1. Visit [Doubleword Portal](https://doubleword.ai)
+2. Create account or log in
+3. Generate API key in settings
+
+### 3. Add Your PDF Files
+
+Place PDF documents in:
+- `data/papers/` folder
+
+The pipeline will process all PDFs in this directory.
+
+### 4. Customize Summarization (Optional)
+
+**Adjust word count:**
+Edit `SUMMARY_WORD_COUNT` in `.env` to change summary length (default: 2000 words)
+
+**Customize prompt template:**
+Edit [summarisation_prompt.txt](summarisation_prompt.txt) to adjust:
+- Output structure and fields
+- Technical complexity level
+- Markdown formatting
+- Required fields
+
+## Usage
+
+### Quick Start - Run Full Pipeline
+
+```bash
+python run_batch_pipeline.py
+```
+
+This orchestrator script runs all three stages automatically:
+1. Extracts PDFs and creates batch requests
+2. Submits to Doubleword API
+3. Polls until complete and downloads summaries
+
+### Manual Step-by-Step
+
+If you prefer to run stages individually:
+
+**Stage 1: Create batch requests**
+```bash
+python create_batch_requests_robust.py
+```
+Output: `batch_requests.jsonl`
+
+**Stage 2: Submit batch**
+```bash
+python submit_batch.py
+```
+Output: `batch_id.txt` with job ID
+
+**Stage 3: Poll and download**
+```bash
+python poll_and_download.py
+```
+Output: Individual summaries in `data/summaries/`
+
+### Monitoring Progress
+
+The polling script shows real-time status:
+```
+[2026-01-25 14:32:15] Status: in_progress | Progress: 12/35
+[2026-01-25 14:32:45] Status: in_progress | Progress: 24/35
+[2026-01-25 14:33:15] Status: completed | Progress: 35/35
+
+✓ Batch completed successfully!
+```
+
+Press `Ctrl+C` to stop polling. Run the script again to resume.
+
+## Project Structure
+
+```
+batch_summary_doubleword/
+├── README.md                           # This file
+├── pyproject.toml                      # Python dependencies (uv)
+├── requirements.txt                    # Python dependencies (pip)
+├── .env.sample                         # Environment variable template
+├── .gitignore                          # Git ignore rules
+├── run_batch_pipeline.py               # Orchestrator script (Python)
+├── summarisation_prompt.txt            # Prompt template for summaries
+├── create_batch_requests_robust.py     # Stage 1: PDF extraction
+├── submit_batch.py                     # Stage 2: Batch submission
+├── poll_and_download.py                # Stage 3: Status polling
+├── process_results.py                  # Result processing
+└── data/
+    ├── papers/                         # Input PDFs
+    └── summaries/                      # Output summaries (auto-created)
+```
+
+**Generated files (not in git):**
+- `batch_requests_YYYYMMDD_HHMMSS.jsonl` - JSONL file with timestamped batch requests
+- `batch_id_YYYYMMDD_HHMMSS.txt` - Timestamped batch job ID
+- `data/summaries/*.md` - Individual paper summaries
+
+## Configuration Options
+
+### Polling Interval
+
+Adjust how frequently the script checks batch status:
+
+```bash
+# In .env file
+POLLING_INTERVAL=60  # Check every 60 seconds
+```
+
+Lower values = faster notification, more API calls
+Higher values = fewer API calls, slower notification
+
+**Recommended:** 30-60 seconds for most use cases
+
+### Model Selection
+
+The default model is `Qwen/Qwen3-VL-235B-A22B-Instruct-FP8`, which supports:
+- Long context windows (128K+ tokens)
+- Vision capabilities (for PDFs with charts/diagrams)
+- Structured output generation
+
+To use a different model, update `DOUBLEWORD_MODEL` in `.env`.
+
+### Completion Window
+
+The batch job completion window determines how long the API has to complete your job. Configure via `COMPLETION_WINDOW` in `.env`:
+
+```bash
+COMPLETION_WINDOW=1h  # Options: "1h" or "24h"
+```
+
+Doubleword typically completes jobs much faster than the window:
+- 2 papers: ~1 minute
+- 35 papers: ~30 minutes
+
+Use `1h` for most cases. Use `24h` only if processing very large batches or if the 1-hour window is insufficient.
+
+## Cost Estimation
+
+Based on actual usage (Jan 2026):
+- **35 papers** (mixed lengths, 45-200 pages each)
+- **Model:** Qwen3-VL-235B-A22B-Instruct-FP8
+- **Cost:** ~15 pence total (~0.43p per paper)
+
+Cost varies by:
+- Document length
+- Requested summary length
+- Model selected
+- Number of requests
+
+## Troubleshooting
+
+### Authentication Errors
+
+```
+Error: Unauthorized
+```
+**Solution:** Check your `DOUBLEWORD_AUTH_TOKEN` in `.env`
+
+### No PDFs Found
+
+```
+Found 0 PDF files to process
+```
+**Solution:** Ensure PDFs are in `data/papers/`
+
+### PDF Extraction Fails
+
+```
+⚠ pypdf failed (KeyError: 'bbox'), trying pdfplumber...
+```
+**Solution:** This is normal - the script automatically falls back to pdfplumber
+
+### Batch Takes Too Long
+
+**Solution:** Doubleword typically completes in ~1 minute. If waiting longer:
+1. Check Doubleword portal for job status
+2. Verify your completion window setting
+3. Contact Doubleword support if job is stuck
+
+### Process Results Error
+
+```
+✗ Error processing results
+```
+**Solution:** Check that `process_results.py` has correct permissions and paths
+
+## Extending the Pipeline
+
+### Adding New Data Sources
+
+To process PDFs from additional folders:
+
+Edit [create_batch_requests_robust.py](create_batch_requests_robust.py:23-25):
+```python
+# Change or add folders
+pdf_files = glob.glob('data/your_folder/*.pdf')
+```
+
+### Customizing Output Format
+
+Edit `summarisation_prompt.txt` to change:
+- Summary structure
+- Required fields
+- Output length
+- Technical depth
+
+### Changing Output Directory
+
+Edit `process_results.py` line 37:
+```python
+summaries_dir = Path('output/my_summaries')  # Custom location
+```
+
+## Technical Stack
+
+- **Python 3.12+** - Core runtime
+- **pypdf** - Primary PDF text extraction
+- **pdfplumber** - Fallback extraction for complex PDFs
+- **OpenAI SDK** - API client (Doubleword API is OpenAI-compatible)
+- **Doubleword API** - Batch inference backend
+- **Qwen3-VL-235B** - Vision-language model for document understanding
+
+## Acknowledgments
+
+Built using:
+- [Doubleword AI](https://app.doubleword.ai/models?page=1) - Batch inference platform
+- [Qwen3-VL] - Open-weight vision-language model provided by Doubleword
+- OpenAI-compatible API standard for seamless integration
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Related Concepts
+
+- **Batch inference** - Processing multiple requests efficiently
+- **Open-weight models** - Qwen3, DeepSeek, Llama alternatives to proprietary models
+- **Structured output** - JSON/markdown formatted LLM responses
+- **Document intelligence** - AI-powered document analysis at scale
