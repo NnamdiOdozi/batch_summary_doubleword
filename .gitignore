@@ -199,3 +199,4 @@ batch_id_*.txt
 # logs
 embedding_logs/
 embedding_logs
+old_batches/

@@ -146,6 +146,11 @@ Examples:
     ):
         sys.exit(1)
 
+    # Allow time for batch ID propagation before polling
+    print("\nWaiting for batch ID to propagate...")
+    import time
+    time.sleep(10)  # Wait 10 seconds for the batch to be queryable
+
     # Stage 3: Poll and process results
     if not run_stage(
         3,
