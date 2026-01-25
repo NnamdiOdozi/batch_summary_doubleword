@@ -13,6 +13,7 @@ This tool extracts text from PDF research papers and generates comprehensive 200
 - **Compliance** - Extract structured data from policy documents at scale
 - **Sentiment analysis** - Process customer feedback documents in bulk
 - **Research synthesis** - Analyze collections of technical reports
+- **LLM/AGENT EVALUATIONS** - Use LLM as a Judge to evaluate LLM and Agent outputs
 
 ## Performance
 
@@ -100,7 +101,7 @@ DOUBLEWORD_BASE_URL=https://api.doubleword.ai/v1
 
 # Model to use
 DOUBLEWORD_MODEL=Qwen/Qwen3-VL-235B-A22B-Instruct-FP8
-or any other model you would like
+or any other model you would like eg the smaller and cheaper Qwen/Qwen3-VL-30B-A3B-Instruct-FP8
 
 # Polling frequency (seconds)
 POLLING_INTERVAL=60
@@ -270,20 +271,6 @@ Cost varies by:
 Error: Unauthorized
 ```
 **Solution:** Check your `DOUBLEWORD_AUTH_TOKEN` in `.env`
-
-### No PDFs Found
-
-```
-Found 0 PDF files to process
-```
-**Solution:** Ensure PDFs are in `data/papers/`
-
-### PDF Extraction Fails
-
-```
-⚠ pypdf failed (KeyError: 'bbox'), trying pdfplumber...
-```
-**Solution:** This is normal - the script automatically falls back to pdfplumber
 
 ### Batch Takes Too Long
 
