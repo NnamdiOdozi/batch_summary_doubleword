@@ -40,7 +40,7 @@ completion_window = os.getenv('COMPLETION_WINDOW', '1h')
 print(f"\nCreating batch job (completion window: {completion_window})...")
 batch = client.batches.create(
     input_file_id=batch_file.id,
-    endpoint="/v1/chat/completions",
+    endpoint=os.getenv('CHAT_COMPLETIONS_ENDPOINT', '/v1/chat/completions'),
     completion_window=completion_window
 )
 

@@ -89,16 +89,16 @@ for idx, pdf_path in enumerate(pdf_files, 1):
     request = {
         "custom_id": f"summary-{safe_filename}",
         "method": "POST",
-        "url": "/v1/chat/completions",
+        "url": os.getenv('CHAT_COMPLETIONS_ENDPOINT', '/v1/chat/completions'),
         "body": {
-            "model": "Qwen/Qwen3-VL-235B-A22B-Instruct-FP8",
+            "model": os.getenv('DOUBLEWORD_MODEL', 'Qwen/Qwen3-VL-235B-A22B-Instruct-FP8'),
             "messages": [
                 {
                     "role": "user",
                     "content": f"{prompt_template}\n\nDocument text:\n{text}"
                 }
             ],
-            "max_tokens": 5000  # Budget for reasoning tokens + 2000 word summary
+            "max_tokens": int(os.getenv('MAX_TOKENS', '5000'))
         }
     }
     requests.append(request)

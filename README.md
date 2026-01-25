@@ -100,6 +100,9 @@ DOUBLEWORD_AUTH_TOKEN=your_api_token_here
 # Doubleword API endpoint
 DOUBLEWORD_BASE_URL=https://api.doubleword.ai/v1
 
+# API endpoint for chat completions (relative to base URL)
+CHAT_COMPLETIONS_ENDPOINT=/v1/chat/completions
+
 # Model to use
 DOUBLEWORD_MODEL=Qwen/Qwen3-VL-235B-A22B-Instruct-FP8
 or any other model you would like eg the smaller and cheaper Qwen/Qwen3-VL-30B-A3B-Instruct-FP8
@@ -113,6 +116,9 @@ COMPLETION_WINDOW=1h
 
 # Summary word count (target length for generated summaries)
 SUMMARY_WORD_COUNT=2000
+
+# Maximum tokens for model response (includes reasoning + summary)
+MAX_TOKENS=5000
 ```
 
 **Get your API key:**
