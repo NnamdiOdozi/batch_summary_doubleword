@@ -161,7 +161,7 @@ The pipeline will automatically detect and process all supported files in this d
 Edit `SUMMARY_WORD_COUNT` in `.env` to change summary length (default: 2000 words)
 
 **Customize prompt template:**
-Edit [summarisation_prompt.txt](summarisation_prompt.txt) to adjust:
+Edit [summarisation_prompt_sample.txt](summarisation_prompt_sample.txt) to adjust:
 - Output structure and fields
 - Technical complexity level
 - Markdown formatting
