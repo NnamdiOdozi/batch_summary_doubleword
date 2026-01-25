@@ -13,7 +13,7 @@ This tool extracts text from PDF research papers and generates comprehensive 200
 - **Compliance** - Extract structured data from policy documents at scale
 - **Sentiment analysis** - Process customer feedback documents in bulk
 - **Research synthesis** - Analyze collections of technical reports
-- **LLM/AGENT EVALUATIONS** - Use LLM as a Judge to evaluate LLM and Agent outputs
+- **LLM/Agent Evaluations** - Use LLM as a Judge to evaluate LLM and Agent outputs
 
 ## Performance
 
@@ -62,6 +62,7 @@ The pipeline consists of three stages:
 ## Setup
 
 ### 1. Install Dependencies
+git clone https://github.com/NnamdiOdozi/batch_summary_doubleword.git
 
 Using uv (recommended):
 ```bash
@@ -116,8 +117,9 @@ SUMMARY_WORD_COUNT=2000
 
 **Get your API key:**
 1. Visit [Doubleword Portal](https://doubleword.ai)
-2. Create account or log in
-3. Generate API key in settings
+2. Click o Join Private Preview
+3. Create account or log in
+4. Generate API key in settings
 
 ### 3. Add Your PDF Files
 
