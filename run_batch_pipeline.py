@@ -2,10 +2,21 @@
 """
 Orchestrator script for the batch summarization pipeline.
 Runs all three stages: extraction, submission, and polling.
+
+Usage:
+  # Process all files in default directory (data/papers/)
+  python run_batch_pipeline.py
+
+  # Process specific files
+  python run_batch_pipeline.py --files paper1.pdf paper2.txt report.docx
+
+  # Process all files in a custom directory
+  python run_batch_pipeline.py --input-dir /path/to/documents/
 """
 
 import os
 import sys
+import argparse
 import subprocess
 from pathlib import Path
 from dotenv import load_dotenv
@@ -41,13 +52,17 @@ def validate_environment():
     print(f"  Polling interval: {os.getenv('POLLING_INTERVAL', '30')} seconds")
 
 
-def run_stage(stage_num, description, script_name):
+def run_stage(stage_num, description, script_name, extra_args=None):
     """Run a pipeline stage."""
     print_header(f"STAGE {stage_num}: {description}")
 
+    cmd = [sys.executable, script_name]
+    if extra_args:
+        cmd.extend(extra_args)
+
     try:
         result = subprocess.run(
-            [sys.executable, script_name],
+            cmd,
             check=True,
             capture_output=False
         )
@@ -61,6 +76,36 @@ def run_stage(stage_num, description, script_name):
 
 def main():
     """Run the complete batch processing pipeline."""
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        description='Run the complete batch summarization pipeline',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+Examples:
+  # Process all files in default directory (data/papers/)
+  python run_batch_pipeline.py
+
+  # Process specific files
+  python run_batch_pipeline.py --files paper1.pdf paper2.txt report.docx
+
+  # Process all files in a custom directory
+  python run_batch_pipeline.py --input-dir /path/to/documents/
+'''
+    )
+    parser.add_argument(
+        '--files',
+        nargs='+',
+        metavar='FILE',
+        help='Specific file paths to process'
+    )
+    parser.add_argument(
+        '--input-dir',
+        metavar='DIR',
+        help='Directory to scan for documents (default: data/papers/)'
+    )
+
+    args = parser.parse_args()
+
     print_header("Doubleword Batch Summarization Pipeline")
 
     # Check for .env file
@@ -77,11 +122,19 @@ def main():
     # Validate environment
     validate_environment()
 
-    # Stage 1: Extract PDFs and create batch requests
+    # Prepare arguments for create_batch.py
+    create_batch_args = []
+    if args.files:
+        create_batch_args.extend(['--files'] + args.files)
+    elif args.input_dir:
+        create_batch_args.extend(['--input-dir', args.input_dir])
+
+    # Stage 1: Extract documents and create batch requests
     if not run_stage(
         1,
-        "Extracting PDFs and creating batch requests",
-        "create_batch.py"
+        "Extracting documents and creating batch requests",
+        "create_batch.py",
+        extra_args=create_batch_args if create_batch_args else None
     ):
         sys.exit(1)
 

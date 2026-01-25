@@ -6,6 +6,7 @@ Supported formats: PDF, DOCX, PPTX, ODP, TXT, MD
 
 import json
 import os
+import argparse
 from pathlib import Path
 from pypdf import PdfReader
 import pdfplumber
@@ -17,6 +18,36 @@ from odf.draw import Frame
 import glob
 from dotenv import load_dotenv
 from datetime import datetime
+
+# Parse command line arguments
+parser = argparse.ArgumentParser(
+    description='Create JSONL batch requests from documents',
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    epilog='''
+Examples:
+  # Process all files in default directory (data/papers/)
+  python create_batch.py
+
+  # Process specific files
+  python create_batch.py --files paper1.pdf paper2.txt report.docx
+
+  # Process all files in a custom directory
+  python create_batch.py --input-dir /path/to/documents/
+'''
+)
+parser.add_argument(
+    '--files',
+    nargs='+',
+    metavar='FILE',
+    help='Specific file paths to process'
+)
+parser.add_argument(
+    '--input-dir',
+    metavar='DIR',
+    help='Directory to scan for documents (default: data/papers/)'
+)
+
+args = parser.parse_args()
 
 # Load environment variables
 load_dotenv()
@@ -37,14 +68,30 @@ print(f"  DOUBLEWORD_MODEL: {os.getenv('DOUBLEWORD_MODEL', 'Qwen/Qwen3-VL-235B-A
 print(f"  MAX_TOKENS: {os.getenv('MAX_TOKENS', '5000')}")
 print()
 
-# Collect all supported files from data/papers directory
+# Collect files based on arguments
 supported_extensions = ['*.pdf', '*.txt', '*.md', '*.docx', '*.pptx', '*.odp']
 all_files = []
-for ext in supported_extensions:
-    all_files.extend(glob.glob(f'data/papers/{ext}'))
-all_files.sort()  # Sort for consistent ordering
 
-print(f"Found {len(all_files)} files to process\n")
+if args.files:
+    # Use specific files provided
+    all_files = [str(Path(f).resolve()) for f in args.files]
+    print(f"Processing {len(all_files)} specified file(s)\n")
+elif args.input_dir:
+    # Scan custom directory
+    input_dir = Path(args.input_dir)
+    if not input_dir.exists():
+        print(f"Error: Directory '{args.input_dir}' does not exist")
+        exit(1)
+    for ext in supported_extensions:
+        all_files.extend(glob.glob(str(input_dir / ext)))
+    all_files.sort()
+    print(f"Found {len(all_files)} files in {args.input_dir}\n")
+else:
+    # Default: scan data/papers directory
+    for ext in supported_extensions:
+        all_files.extend(glob.glob(f'data/papers/{ext}'))
+    all_files.sort()
+    print(f"Found {len(all_files)} files in data/papers/\n")
 
 requests = []
 failed_files = []

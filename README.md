@@ -1,15 +1,15 @@
-# Batch PDF Summarization with Doubleword API
+# Batch Document Summarization with Doubleword API
 
-A simple Python pipeline for batch processing PDF documents into structured summaries using the Doubleword API and open-weight models.
+A simple Python pipeline for batch processing documents (PDF, DOCX, PPTX, TXT, MD, ODP) into structured summaries using the Doubleword API and open-weight models.
 
 ## Overview
 
-This tool extracts text from PDF research papers and generates comprehensive 2000-word structured summaries using Doubleword's batch inference API. Originally built for literature reviews in actuarial machine learning research, it can be adapted for any bulk document summarization task.
+This tool extracts text from multiple document formats and generates comprehensive 2000-word structured summaries using Doubleword's batch inference API. Originally built for literature reviews in actuarial machine learning research, it can be adapted for any bulk document summarization task.
 
 ## Use Cases
 
 - **Literature reviews** - Summarize academic papers systematically
-- **Regulatory analysis** - Convert 200-page consultation papers into actionable digests
+- **Regulatory analysis** - Convert 100-page consultation papers into actionable digests
 - **Compliance** - Extract structured data from policy documents at scale
 - **Sentiment analysis** - Process customer feedback documents in bulk
 - **Research synthesis** - Analyze collections of technical reports
@@ -23,17 +23,33 @@ This tool extracts text from PDF research papers and generates comprehensive 200
 - **Total cost:** ~15 pence for 35 papers
 - **SLA:** Selected 24-hour window, actual delivery < 30 minutes
 
+## Supported File Formats
+
+- **PDF** (`.pdf`) - Research papers, reports, articles
+- **Microsoft Word** (`.docx`) - Documents, proposals
+- **Microsoft PowerPoint** (`.pptx`) - Presentations, slide decks
+- **OpenDocument Presentation** (`.odp`) - Open format presentations
+- **Plain Text** (`.txt`) - Text documents
+- **Markdown** (`.md`) - Technical documentation, notes
+
+All formats are processed through the same pipeline with automatic file type detection.
+
 ## How It Works
 
 The pipeline consists of three stages:
 
-### Stage 1: PDF Extraction & Batch Request Creation
+### Stage 1: Document Extraction & Batch Request Creation
 **Script:** `create_batch.py`
 
-- Scans `data/papers/` folder for PDF files
-- Extracts text using **pypdf** (fast) with **pdfplumber** fallback (robust)
+- Scans `data/papers/` folder (or custom location via `--input-dir`)
+- Extracts text from multiple formats:
+  - **PDF:** pypdf (fast) with pdfplumber fallback (robust)
+  - **DOCX:** python-docx
+  - **PPTX:** python-pptx
+  - **ODP:** odfpy
+  - **TXT/MD:** Direct text read
 - Creates structured JSONL batch requests with custom summarization prompt
-- Outputs: `batch_requests.jsonl`
+- Outputs: `batch_requests_{timestamp}.jsonl`
 
 ### Stage 2: Batch Submission
 **Script:** `submit_batch.py`
@@ -82,6 +98,9 @@ pip install -r requirements.txt
 **Requirements** ([requirements.txt](requirements.txt)):
 - `pypdf>=6.6.0` - Fast PDF text extraction
 - `pdfplumber>=0.11.9` - Robust fallback for complex PDFs
+- `python-docx>=1.1.0` - Microsoft Word document extraction
+- `python-pptx>=1.0.0` - PowerPoint presentation extraction
+- `odfpy>=1.4.1` - OpenDocument format extraction
 - `openai>=2.14.0` - API client (compatible with Doubleword API)
 - `python-dotenv>=1.1.0` - Environment variable management
 
@@ -123,16 +142,18 @@ MAX_TOKENS=5000
 
 **Get your API key:**
 1. Visit [Doubleword Portal](https://doubleword.ai)
-2. Click o Join Private Preview
+2. Click to join Private Preview
 3. Create account or log in
 4. Generate API key in settings
 
-### 3. Add Your PDF Files
+### 3. Add Your Documents
 
-Place PDF documents in:
+Place documents in:
 - `data/papers/` folder
 
-The pipeline will process all PDFs in this directory.
+Supported formats: PDF, DOCX, PPTX, ODP, TXT, MD
+
+The pipeline will automatically detect and process all supported files in this directory.
 
 ### 4. Customize Summarization (Optional)
 
@@ -155,19 +176,53 @@ python run_batch_pipeline.py
 ```
 
 This orchestrator script runs all three stages automatically:
-1. Extracts PDFs and creates batch requests
+1. Extracts documents and creates batch requests
 2. Submits to Doubleword API
 3. Polls until complete and downloads summaries
+
+### Command Line Options
+
+**Process all files in default directory:**
+```bash
+python run_batch_pipeline.py
+```
+
+**Process specific files:**
+```bash
+python run_batch_pipeline.py --files paper1.pdf report.docx slides.pptx
+```
+
+**Process files from custom directory:**
+```bash
+python run_batch_pipeline.py --input-dir /path/to/documents/
+```
+
+**View all options:**
+```bash
+python run_batch_pipeline.py --help
+python create_batch.py --help
+```
 
 ### Manual Step-by-Step
 
 If you prefer to run stages individually:
 
-**Stage 1: Create batch requests**
+**Stage 1: Create batch requests (all files in data/papers/)**
 ```bash
 python create_batch.py
 ```
-Output: `batch_requests.jsonl`
+
+Or process specific files:
+```bash
+python create_batch.py --files doc1.pdf doc2.docx
+```
+
+Or process custom directory:
+```bash
+python create_batch.py --input-dir /custom/path/
+```
+
+Output: `batch_requests_{timestamp}.jsonl`
 
 **Stage 2: Submit batch**
 ```bash
@@ -204,7 +259,7 @@ batch_summary_doubleword/
 ├── .env.sample                         # Environment variable template
 ├── .gitignore                          # Git ignore rules
 ├── run_batch_pipeline.py               # Orchestrator script (Python)
-├── summarisation_prompt.txt            # Prompt template for summaries
+├── summarisation_prompt_sample.txt            # Prompt template for summaries
 ├── create_batch.py     # Stage 1: PDF extraction
 ├── submit_batch.py                     # Stage 2: Batch submission
 ├── poll_and_process.py                 # Stage 3: Polling and processing
@@ -298,12 +353,15 @@ Error: Unauthorized
 
 ### Adding New Data Sources
 
-To process PDFs from additional folders:
+Use the `--input-dir` option to process files from any directory:
 
-Edit [create_batch.py](create_batch.py:23-25):
-```python
-# Change or add folders
-pdf_files = glob.glob('data/your_folder/*.pdf')
+```bash
+python run_batch_pipeline.py --input-dir /path/to/your/documents/
+```
+
+Or process specific files regardless of location:
+```bash
+python run_batch_pipeline.py --files /path/to/file1.pdf /other/path/file2.docx
 ```
 
 ### Customizing Output Format
@@ -326,6 +384,9 @@ summaries_dir = Path('output/my_summaries')  # Custom location
 - **Python 3.12+** - Core runtime
 - **pypdf** - Primary PDF text extraction
 - **pdfplumber** - Fallback extraction for complex PDFs
+- **python-docx** - Microsoft Word document extraction
+- **python-pptx** - PowerPoint presentation extraction
+- **odfpy** - OpenDocument format extraction
 - **OpenAI SDK** - API client (Doubleword API is OpenAI-compatible)
 - **Doubleword API** - Batch inference backend
 - **Qwen3-VL-235B** - Vision-language model for document understanding
