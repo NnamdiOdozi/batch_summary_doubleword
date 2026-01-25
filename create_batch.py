@@ -14,7 +14,7 @@ from datetime import datetime
 load_dotenv()
 
 # Read summarization prompt and substitute word count
-with open('summarisation_prompt.txt', 'r') as f:
+with open('summarisation_prompt_sample.txt', 'r') as f:
     prompt_template = f.read()
 
 # Substitute word count from environment variable (default to 2000)
@@ -121,4 +121,4 @@ if failed_files:
     for path, reason in failed_files:
         print(f"  - {Path(path).name}: {reason}")
 
-print(f"\nNext step: Run submit_batch.py")
+print(f"\nNext step: python submit_batch.py")

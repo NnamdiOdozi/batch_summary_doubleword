@@ -28,7 +28,7 @@ This tool extracts text from PDF research papers and generates comprehensive 200
 The pipeline consists of three stages:
 
 ### Stage 1: PDF Extraction & Batch Request Creation
-**Script:** `create_batch_requests_robust.py`
+**Script:** `create_batch.py`
 
 - Scans `data/papers/` folder for PDF files
 - Extracts text using **pypdf** (fast) with **pdfplumber** fallback (robust)
@@ -43,8 +43,8 @@ The pipeline consists of three stages:
 - Saves batch ID to `batch_id.txt` for tracking
 - Outputs: Batch ID for monitoring
 
-### Stage 3: Polling & Download
-**Script:** `poll_and_download.py`
+### Stage 3: Polling & Processing
+**Script:** `poll_and_process.py`
 
 - Polls batch job status at configurable intervals (default: 60 seconds)
 - Automatically downloads results when completed
@@ -159,7 +159,7 @@ If you prefer to run stages individually:
 
 **Stage 1: Create batch requests**
 ```bash
-python create_batch_requests_robust.py
+python create_batch.py
 ```
 Output: `batch_requests.jsonl`
 
@@ -169,9 +169,9 @@ python submit_batch.py
 ```
 Output: `batch_id.txt` with job ID
 
-**Stage 3: Poll and download**
+**Stage 3: Poll and process**
 ```bash
-python poll_and_download.py
+python poll_and_process.py
 ```
 Output: Individual summaries in `data/summaries/`
 
@@ -199,9 +199,9 @@ batch_summary_doubleword/
 ├── .gitignore                          # Git ignore rules
 ├── run_batch_pipeline.py               # Orchestrator script (Python)
 ├── summarisation_prompt.txt            # Prompt template for summaries
-├── create_batch_requests_robust.py     # Stage 1: PDF extraction
+├── create_batch.py     # Stage 1: PDF extraction
 ├── submit_batch.py                     # Stage 2: Batch submission
-├── poll_and_download.py                # Stage 3: Status polling
+├── poll_and_process.py                 # Stage 3: Polling and processing
 ├── process_results.py                  # Result processing
 └── data/
     ├── papers/                         # Input PDFs
@@ -294,7 +294,7 @@ Error: Unauthorized
 
 To process PDFs from additional folders:
 
-Edit [create_batch_requests_robust.py](create_batch_requests_robust.py:23-25):
+Edit [create_batch.py](create_batch.py:23-25):
 ```python
 # Change or add folders
 pdf_files = glob.glob('data/your_folder/*.pdf')

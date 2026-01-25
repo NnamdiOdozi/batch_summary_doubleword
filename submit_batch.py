@@ -19,7 +19,7 @@ client = OpenAI(
 # Find most recent batch_requests file
 batch_files = glob.glob('batch_requests_*.jsonl')
 if not batch_files:
-    print("Error: No batch_requests_*.jsonl files found. Run create_batch_requests_robust.py first.")
+    print("Error: No batch_requests_*.jsonl files found. Run create_batch.py first.")
     exit(1)
 
 latest_batch_file = max(batch_files, key=os.path.getmtime)
@@ -55,4 +55,4 @@ with open(batch_id_file, 'w') as f:
     f.write(batch.id)
 
 print(f"\nBatch ID saved to {batch_id_file}")
-print("Next step: Run poll_and_download.py to monitor progress")
+print("Next step: Run poll_and_process.py to monitor progress")

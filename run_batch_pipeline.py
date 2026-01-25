@@ -81,7 +81,7 @@ def main():
     if not run_stage(
         1,
         "Extracting PDFs and creating batch requests",
-        "create_batch_requests_robust.py"
+        "create_batch.py"
     ):
         sys.exit(1)
 
@@ -93,11 +93,11 @@ def main():
     ):
         sys.exit(1)
 
-    # Stage 3: Poll and download results
+    # Stage 3: Poll and process results
     if not run_stage(
         3,
-        "Polling for results and downloading",
-        "poll_and_download.py"
+        "Polling for results and processing summaries",
+        "poll_and_process.py"
     ):
         sys.exit(1)
 
