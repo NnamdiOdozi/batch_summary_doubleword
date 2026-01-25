@@ -16,6 +16,14 @@ client = OpenAI(
     base_url=os.environ['DOUBLEWORD_BASE_URL']
 )
 
+# Print environment variables being used
+print("Environment Variables:")
+print(f"  DOUBLEWORD_BASE_URL: {os.environ['DOUBLEWORD_BASE_URL']}")
+print(f"  DOUBLEWORD_AUTH_TOKEN: {'*' * 20}...{os.environ['DOUBLEWORD_AUTH_TOKEN'][-4:]}")
+print(f"  COMPLETION_WINDOW: {os.getenv('COMPLETION_WINDOW', '1h')}")
+print(f"  CHAT_COMPLETIONS_ENDPOINT: {os.getenv('CHAT_COMPLETIONS_ENDPOINT', '/v1/chat/completions')}")
+print()
+
 # Find most recent batch_requests file
 batch_files = glob.glob('batch_requests_*.jsonl')
 if not batch_files:
