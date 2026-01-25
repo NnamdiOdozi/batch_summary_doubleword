@@ -129,7 +129,7 @@ or any other model you would like eg the smaller and cheaper Qwen/Qwen3-VL-30B-A
 # Polling frequency (seconds)
 POLLING_INTERVAL=60
 
-# Batch completion window (how long the API has to complete the job)
+# Batch completion window or SLA (how long the API has to complete the job)
 # Options: "1h" or "24h"
 COMPLETION_WINDOW=1h
 
@@ -299,7 +299,7 @@ The default model is `Qwen/Qwen3-VL-235B-A22B-Instruct-FP8`, which supports:
 
 To use a different model, update `DOUBLEWORD_MODEL` in `.env`.
 
-### Completion Window
+### Completion Window / SLA
 
 The batch job completion window determines how long the API has to complete your job. Configure via `COMPLETION_WINDOW` in `.env`:
 

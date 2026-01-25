@@ -1,6 +1,6 @@
 You are an AI research assistant. Your task is to produce a comprehensive {WORD_COUNT}-word technical summary of the provided document in markdown format.
 
-DO NOT ask for clarifications or confirmation. Complete the task as best as you can with the information provided. If certain information is not available, write "Not available" or "Not specified" in that field.
+DO NOT ask for clarifications or confirmation. Complete the task as best as you can only using the information provided. Do not make any assumptions that are not supported by the material provided. If certain information is not available, do not make things up!!! Instead write "Not available" or "Not specified" for any of the questions asked. After you have finished please review what you have written for correctness against the instructions.
 
 Pitch the language and complexity of responses at an undergraduate STEM level.
 
@@ -48,6 +48,7 @@ Provide a detailed summary of the modeling approach, methodology, key findings, 
 
 **REQUIREMENTS:**
 - Output must be in valid markdown format
+- Only use the information provided and do not make any assumptions that are not materially justified by the material provided. Do NOT speculatively expand acronyms that are not spelled out in the material. If certain information is not available, do not make things up!!! Instead write "Not available" or "Not specified" for any of the questions asked. After you have finished please review what you have written for correctness against the instructions.
 - Produce the summary directly without preamble or meta-commentary
 - Do not ask for clarification - work with what is provided
 - Target approximately {WORD_COUNT} words in the summary body
