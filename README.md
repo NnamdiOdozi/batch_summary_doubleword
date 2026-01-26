@@ -1,15 +1,15 @@
 # Batch Document Summarization with Doubleword API
 
-A simple Python pipeline for batch processing documents (PDF, DOCX, PPTX, TXT, MD, ODP) into structured summaries using the Doubleword API and open-weight models.
+A simple Python CLI Pipeline for batch processing documents (PDF, DOCX, PPTX, TXT, MD, ODP) into structured summaries using the low-cost Doubleword API and open-weight models. Just load your docs, a prompt and then the Doubleword API key and you're good to go.
 
 ## Overview
 
-This tool extracts text from multiple document formats and generates comprehensive 2000-word structured summaries using Doubleword's batch inference API. Originally built for literature reviews in actuarial machine learning research, it can be adapted for any bulk document summarization task.
+This tool extracts text from multiple document formats and generates comprehensive ~2000-word structured summaries using Doubleword's batch inference API. Originally built for literature reviews in actuarial machine learning research, it can be adapted for any bulk document summarization task.
 
 ## Use Cases
 
 - **Literature reviews** - Summarize academic papers systematically
-- **Regulatory analysis** - Convert 100-page consultation papers into actionable digests
+- **Regulatory analysis** - Convert 200-page consultation papers into actionable digests
 - **Compliance** - Extract structured data from policy documents at scale
 - **Sentiment analysis** - Process customer feedback documents in bulk
 - **Research synthesis** - Analyze collections of technical reports
