@@ -1,6 +1,6 @@
 # Batch Document Summarization with Doubleword API
 
-A simple Python CLI Pipeline for batch processing documents (PDF, DOCX, PPTX, TXT, MD, ODP) into structured summaries using the low-cost Doubleword API and open-weight models. Just load your docs, a prompt and then the Doubleword API key and you're good to go.
+A simple Python CLI Pipeline for batch processing documents (PDF, DOCX, PPTX, TXT, MD, ODP) into structured summaries using the low-cost Doubleword API and open-weight models. Just load your docs, a prompt, and then the Doubleword API key and you're good to go.
 
 ## Overview
 
@@ -146,11 +146,7 @@ MAX_TOKENS=5000
 3. Create account or log in
 4. Generate API key in settings
 
-### 3. Add Your Documents
-   
-           
-
-
+### 3. Add Your Documents 
       
 Place documents in:
 - `data/papers/` folder
@@ -315,7 +311,7 @@ Doubleword typically completes jobs much faster than the window:
 - 2 papers: ~1 minute
 - 35 papers: ~30 minutes
 
-Use `1h` for most cases. Use `24h` only if processing very large batches or if the 1-hour window is insufficient.
+Use `1h` for most cases. Use `24h` if you want even cheaper pricing and if task is not as time critical.
 
 ## Cost Estimation
 
