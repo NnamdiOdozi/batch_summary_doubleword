@@ -53,7 +53,7 @@ args = parser.parse_args()
 load_dotenv()
 
 # Read summarization prompt and substitute word count
-with open('summarisation_prompt_sample.txt', 'r') as f:
+with open('summarisation_prompt.txt', 'r') as f:
     prompt_template = f.read()
 
 # Substitute word count from environment variable (default to 2000)

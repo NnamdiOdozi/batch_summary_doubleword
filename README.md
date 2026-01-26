@@ -147,11 +147,15 @@ MAX_TOKENS=5000
 4. Generate API key in settings
 
 ### 3. Add Your Documents
+   
+           
 
+
+      
 Place documents in:
 - `data/papers/` folder
 
-Supported formats: PDF, DOCX, PPTX, ODP, TXT, MD
+Supported formats: PDF, DOCX, PPTX, ODP, TXT, MD     
 
 The pipeline will automatically detect and process all supported files in this directory.
 
@@ -161,7 +165,7 @@ The pipeline will automatically detect and process all supported files in this d
 Edit `SUMMARY_WORD_COUNT` in `.env` to change summary length (default: 2000 words)
 
 **Customize prompt template:**
-Edit [summarisation_prompt_sample.txt](summarisation_prompt_sample.txt) to adjust:
+Edit [summarisation_prompt.txt](summarisation_prompt.txt) to adjust:
 - Output structure and fields
 - Technical complexity level
 - Markdown formatting
@@ -259,7 +263,7 @@ batch_summary_doubleword/
 ├── .env.sample                         # Environment variable template
 ├── .gitignore                          # Git ignore rules
 ├── run_batch_pipeline.py               # Orchestrator script (Python)
-├── summarisation_prompt_sample.txt            # Prompt template for summaries
+├── summarisation_prompt.txt            # Prompt template for summaries
 ├── create_batch.py     # Stage 1: PDF extraction
 ├── submit_batch.py                     # Stage 2: Batch submission
 ├── poll_and_process.py                 # Stage 3: Polling and processing
