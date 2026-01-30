@@ -1,6 +1,6 @@
 # Batch Document Summarization with Doubleword API
 
-A simple Python CLI Pipeline for batch processing documents (PDF, DOCX, PPTX, TXT, MD, ODP) into structured summaries using the low-cost Doubleword API and open-weight models. Just load your docs, a prompt, and then the Doubleword API key and you're good to go.
+A simple Python CLI Pipeline for batch processing documents (PDF, DOCX, PPTX, TXT, MD, ODP) into structured summaries using the ultra low-cost Doubleword API and open-weight models. Just load your docs, a prompt, and then the Doubleword API key and you're good to go.
 
 ## Overview
 
@@ -401,6 +401,12 @@ Built using:
 ## License
 
 MIT License - see LICENSE file for details
+
+## Next Steps
+- Try out streaming feature
+- Test the model's vision capabilities
+- LLM as a Judge  - this is often token intensive and async and so a good candidate for batch inference
+- Add temperature, top_p, top_k, frequency penalty, presence penalty etc to .env or config file 
 
 ## Related Concepts
 
